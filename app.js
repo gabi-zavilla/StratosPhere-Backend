@@ -1,4 +1,4 @@
-const APPS_SCRIPT_URL = "https://script.google.com/a/macros/economist.com/s/AKfycbz2r5pzAgtO8EHAaJby5pW8BGMoCmzA8MJXE2dS75x4GCzEhdDC5aHF-Oigv5gM9z3x/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2r5pzAgtO8EHAaJby5pW8BGMoCmzA8MJXE2dS75x4GCzEhdDC5aHF-Oigv5gM9z3x/exec";
 
 const state = {
   activeView: "executive",
@@ -72,7 +72,9 @@ async function loadLiveDashboardPayload() {
     state.liveDataStatus = "Direct JSON connected";
     return payload;
   } catch (error) {
-    state.liveDataStatus = `Direct JSON failed: ${error.message}`;
+    state.liveDataStatus = state.liveDataStatus
+      ? `${state.liveDataStatus}; Direct JSON failed: ${error.message}`
+      : `Direct JSON failed: ${error.message}`;
     console.warn("Direct Apps Script JSON request failed.", error);
     return null;
   }

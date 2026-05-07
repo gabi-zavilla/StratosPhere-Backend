@@ -8,6 +8,7 @@ const state = {
   sourceWorkbook: "",
   extractedAt: "",
   liveDashboardPayload: null,
+  liveDataStatus: "Not checked",
   evaluations: [],
   evidence: [],
   jiraTickets: []
@@ -38,6 +39,7 @@ async function init() {
   await loadWorkbookData();
   state.liveDashboardPayload = await loadLiveDashboardPayload().catch(error => {
     console.warn("Live Google Sheet dashboard payload failed; using local workbook snapshot.", error);
+    state.liveDataStatus = error.message || "Live data failed";
     return null;
   });
   if (!state.services.length) state.services = load("services", sampleServices);
@@ -55,6 +57,7 @@ async function loadLiveDashboardPayload() {
   try {
     return await loadLiveDashboardPayloadJsonp();
   } catch (error) {
+    state.liveDataStatus = `JSONP failed: ${error.message}`;
     console.warn("Apps Script JSONP request failed; trying direct JSON mode.", error);
   }
 
@@ -65,8 +68,11 @@ async function loadLiveDashboardPayload() {
       cache: "no-store"
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
+    const payload = await response.json();
+    state.liveDataStatus = "Direct JSON connected";
+    return payload;
   } catch (error) {
+    state.liveDataStatus = `Direct JSON failed: ${error.message}`;
     console.warn("Direct Apps Script JSON request failed.", error);
     return null;
   }
@@ -92,6 +98,7 @@ function loadLiveDashboardPayloadJsonp() {
     }
 
     window.testCallback = payload => {
+      state.liveDataStatus = "JSONP connected";
       cleanup();
       resolve(payload);
     };
@@ -161,7 +168,7 @@ function render() {
   document.getElementById("summaryText").innerHTML = payload.executiveSummary;
   document.getElementById("lastSync").textContent = state.liveDashboardPayload
     ? `LIVE GOOGLE SHEET · ${payload.lastSyncText || "CONNECTED"}`
-    : payload.lastSyncText;
+    : `${payload.lastSyncText} · ${state.liveDataStatus}`;
   document.getElementById("breachRatio").textContent = `${payload.breachSummary.shown} / ${payload.breachSummary.total} violating target`;
   renderTopMetrics(payload.executiveMetrics);
   renderPostureMetrics(payload.postureMetrics);

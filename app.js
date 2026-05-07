@@ -79,7 +79,6 @@ function loadLiveDashboardPayloadJsonp() {
       return;
     }
 
-    const callbackName = `stratosDashboardCallback_${Date.now()}`;
     const script = document.createElement("script");
     const timeout = window.setTimeout(() => {
       cleanup();
@@ -88,11 +87,11 @@ function loadLiveDashboardPayloadJsonp() {
 
     function cleanup() {
       window.clearTimeout(timeout);
-      delete window[callbackName];
+      delete window.testCallback;
       if (script.parentNode) script.parentNode.removeChild(script);
     }
 
-    window[callbackName] = payload => {
+    window.testCallback = payload => {
       cleanup();
       resolve(payload);
     };
@@ -102,7 +101,7 @@ function loadLiveDashboardPayloadJsonp() {
       reject(new Error("Apps Script live data request failed"));
     };
 
-    script.src = `${APPS_SCRIPT_URL}?action=dashboard&callback=${callbackName}`;
+    script.src = `${APPS_SCRIPT_URL}?action=dashboard&callback=testCallback&cacheBust=${Date.now()}`;
     document.body.appendChild(script);
   });
 }

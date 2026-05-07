@@ -1,0 +1,63 @@
+- id: svc-payments
+  name: Payments Gateway
+  pillar: Customer
+  tier: Tier 1
+  owner: Payments Platform
+  service_type: Internal
+  status: TechOps Review
+  due_date: 2026-05-20
+  completed_on_time: Late
+- id: svc-ledger
+  name: Core Ledger
+  pillar: Finance
+  tier: Tier 1
+  owner: Ledger Team
+  service_type: Internal
+  status: Awaiting Evidence
+  due_date: 2026-06-04
+  completed_on_time: Completed
+- id: svc-identity
+  name: Identity Access
+  pillar: Security
+  tier: Tier 2
+  owner: IAM
+  service_type: Internal
+  status: Scheduled
+  due_date: 2026-06-18
+  completed_on_time:
+- id: svc-pricing
+  name: Pricing Service
+  pillar: Commercial
+  tier: Tier 2
+  owner: Revenue Engineering
+  service_type: Internal
+  status: TechOps Review
+  due_date: 2026-05-28
+  completed_on_time: Late
+- id: svc-notify
+  name: Notification Hub
+  pillar: Operations
+  tier: Tier 3
+  owner: Comms Platform
+  service_type: Internal
+  status: Done
+  due_date: 2026-07-10
+  completed_on_time: Completed
+- id: svc-reporting
+  name: Regulatory Reporting
+  pillar: Risk
+  tier: Tier 1
+  owner: Risk Data
+  service_type: Internal
+  status: Scheduled
+  due_date: 2026-07-22
+  completed_on_time:
+- id: svc-data
+  name: Data Exchange
+  pillar: Data
+  tier: Tier 2
+  owner: Data Platform
+  service_type: Internal
+  status: Awaiting Evidence
+  due_date: 2026-08-14
+  completed_on_time:

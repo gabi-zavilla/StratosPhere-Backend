@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>StratoSphere Resilience Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,700;6..72,800&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">S</span>
+          <div>
+            <strong>StratoSphere</strong>
+            <span>Resilience Intelligence</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Primary navigation">
+          <button class="nav-item active" data-view="executive">Executive Report</button>
+          <button class="nav-item" data-view="queue">TechOps Queue</button>
+          <button class="nav-item" data-view="catalogue">Service Catalogue</button>
+          <button class="nav-item" data-view="schedule">Testing Schedule</button>
+          <button class="nav-item" data-view="evidence">Evidence Repository</button>
+          <button class="nav-item" data-view="jira">Jira Actions</button>
+          <button class="nav-item" data-view="admin">Admin Controls</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Agentic resilience testing management</p>
+            <h1 id="pageTitle">Executive Portfolio Report</h1>
+          </div>
+          <div class="topbar-actions">
+            <select id="roleSelect" aria-label="Role">
+              <option value="exec">Exec</option>
+              <option value="techops">TechOps</option>
+              <option value="engineer">Engineer</option>
+              <option value="admin">Admin</option>
+            </select>
+            <button class="primary" id="runEvaluationBtn">Run Evaluation</button>
+          </div>
+        </header>
+
+        <section class="summary-band">
+          <div>
+            <p class="section-label">Portfolio Intelligence Summary</p>
+            <p id="summaryText">Loading dashboard...</p>
+          </div>
+          <div class="sync-block">
+            <span id="lastSync">LAST SYNC: --</span>
+            <button class="ghost" id="refreshBtn">Refresh</button>
+          </div>
+        </section>
+
+        <section id="viewExecutive" class="view active">
+          <div class="metric-grid" id="topMetrics"></div>
+          <div class="metric-grid posture" id="postureMetrics"></div>
+          <div class="split">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Services in breach of target</h2>
+                  <p id="breachRatio">0 / 0 violating target</p>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Service Entity</th>
+                      <th>Risk Tier</th>
+                      <th>Breach Score</th>
+                      <th>Primary Risk Driver</th>
+                    </tr>
+                  </thead>
+                  <tbody id="riskTableBody"></tbody>
+                </table>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Portfolio Analysis</h2>
+              </div>
+              <canvas id="portfolioChart" width="720" height="420"></canvas>
+            </section>
+          </div>
+        </section>
+
+        <section id="viewQueue" class="view">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>TechOps Evaluation Actions</h2>
+              <button class="secondary" id="autoRunReadyBtn">Auto-run review-ready</button>
+            </div>
+            <div class="work-grid" id="queueCards"></div>
+          </div>
+        </section>
+
+        <section id="viewCatalogue" class="view">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Service Catalogue Extract</h2>
+              <button class="secondary" id="loadYamlBtn">Read YAML</button>
+            </div>
+            <div class="filters">
+              <input id="serviceSearch" type="search" placeholder="Search service, owner, pillar" />
+              <select id="tierFilter">
+                <option value="">All tiers</option>
+                <option value="Tier 1">Tier 1</option>
+                <option value="Tier 2">Tier 2</option>
+                <option value="Tier 3">Tier 3</option>
+                <option value="Tier 4">Tier 4</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Pillar</th>
+                    <th>Tier</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="catalogueBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="viewSchedule" class="view">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Evenly Distributed Testing Schedule</h2>
+              <button class="secondary" id="rebalanceBtn">Rebalance Schedule</button>
+            </div>
+            <div class="timeline" id="scheduleTimeline"></div>
+          </div>
+        </section>
+
+        <section id="viewEvidence" class="view">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Evidence Repository</h2>
+            </div>
+            <form class="upload-form" id="uploadForm">
+              <select id="uploadService"></select>
+              <input id="uploadFile" type="file" />
+              <button class="primary" type="submit">Extract for Evaluation</button>
+            </form>
+            <div class="work-grid" id="evidenceCards"></div>
+          </div>
+        </section>
+
+        <section id="viewJira" class="view">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Jira Action Sync</h2>
+              <button class="secondary" id="createJiraBtn">Generate RT Tickets</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Service</th>
+                    <th>Board</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                  </tr>
+                </thead>
+                <tbody id="jiraBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="viewAdmin" class="view">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Admin Controls</h2>
+            </div>
+            <div class="settings-grid">
+              <label>Evidence folder<input value="/Resilience/Evidence/{service}/{review}" /></label>
+              <label>Generated documents folder<input value="/Resilience/Generated/{service}/{review}" /></label>
+              <label>Jira project key<input value="RT" /></label>
+              <label>Review-ready status<input value="TechOps Review" /></label>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

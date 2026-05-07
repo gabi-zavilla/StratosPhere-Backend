@@ -53,6 +53,12 @@ async function loadLiveDashboardPayload() {
   if (!APPS_SCRIPT_URL) return null;
 
   try {
+    return await loadLiveDashboardPayloadJsonp();
+  } catch (error) {
+    console.warn("Apps Script JSONP request failed; trying direct JSON mode.", error);
+  }
+
+  try {
     const response = await fetch(`${APPS_SCRIPT_URL}?action=dashboard`, {
       method: "GET",
       mode: "cors",
@@ -61,8 +67,8 @@ async function loadLiveDashboardPayload() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return await response.json();
   } catch (error) {
-    console.warn("Direct Apps Script JSON request failed; trying JSONP callback mode.", error);
-    return loadLiveDashboardPayloadJsonp();
+    console.warn("Direct Apps Script JSON request failed.", error);
+    return null;
   }
 }
 
@@ -154,7 +160,9 @@ function setView(view) {
 function render() {
   const payload = state.liveDashboardPayload || getDashboardPayload();
   document.getElementById("summaryText").innerHTML = payload.executiveSummary;
-  document.getElementById("lastSync").textContent = payload.lastSyncText;
+  document.getElementById("lastSync").textContent = state.liveDashboardPayload
+    ? `LIVE GOOGLE SHEET · ${payload.lastSyncText || "CONNECTED"}`
+    : payload.lastSyncText;
   document.getElementById("breachRatio").textContent = `${payload.breachSummary.shown} / ${payload.breachSummary.total} violating target`;
   renderTopMetrics(payload.executiveMetrics);
   renderPostureMetrics(payload.postureMetrics);

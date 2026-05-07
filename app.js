@@ -1,3 +1,5 @@
+const APPS_SCRIPT_URL = "https://script.google.com/a/macros/economist.com/s/AKfycbz2r5pzAgtO8EHAaJby5pW8BGMoCmzA8MJXE2dS75x4GCzEhdDC5aHF-Oigv5gM9z3x/exec";
+
 const state = {
   activeView: "executive",
   role: "exec",
@@ -5,6 +7,7 @@ const state = {
   riskEngine: [],
   sourceWorkbook: "",
   extractedAt: "",
+  liveDashboardPayload: null,
   evaluations: [],
   evidence: [],
   jiraTickets: []
@@ -33,6 +36,10 @@ const sampleEvaluations = [
 
 async function init() {
   await loadWorkbookData();
+  state.liveDashboardPayload = await loadLiveDashboardPayload().catch(error => {
+    console.warn("Live Google Sheet dashboard payload failed; using local workbook snapshot.", error);
+    return null;
+  });
   if (!state.services.length) state.services = load("services", sampleServices);
   if (!state.riskEngine.length) state.riskEngine = load("riskEngine", []);
   state.evaluations = load("evaluations", state.riskEngine.length ? [] : sampleEvaluations);
@@ -40,6 +47,58 @@ async function init() {
   state.jiraTickets = load("jiraTickets", []);
   bindEvents();
   render();
+}
+
+async function loadLiveDashboardPayload() {
+  if (!APPS_SCRIPT_URL) return null;
+
+  try {
+    const response = await fetch(`${APPS_SCRIPT_URL}?action=dashboard`, {
+      method: "GET",
+      mode: "cors",
+      cache: "no-store"
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.warn("Direct Apps Script JSON request failed; trying JSONP callback mode.", error);
+    return loadLiveDashboardPayloadJsonp();
+  }
+}
+
+function loadLiveDashboardPayloadJsonp() {
+  return new Promise((resolve, reject) => {
+    if (!APPS_SCRIPT_URL) {
+      resolve(null);
+      return;
+    }
+
+    const callbackName = `stratosDashboardCallback_${Date.now()}`;
+    const script = document.createElement("script");
+    const timeout = window.setTimeout(() => {
+      cleanup();
+      reject(new Error("Apps Script live data request timed out"));
+    }, 12000);
+
+    function cleanup() {
+      window.clearTimeout(timeout);
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[callbackName] = payload => {
+      cleanup();
+      resolve(payload);
+    };
+
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("Apps Script live data request failed"));
+    };
+
+    script.src = `${APPS_SCRIPT_URL}?action=dashboard&callback=${callbackName}`;
+    document.body.appendChild(script);
+  });
 }
 
 async function loadWorkbookData() {
@@ -93,7 +152,7 @@ function setView(view) {
 }
 
 function render() {
-  const payload = getDashboardPayload();
+  const payload = state.liveDashboardPayload || getDashboardPayload();
   document.getElementById("summaryText").innerHTML = payload.executiveSummary;
   document.getElementById("lastSync").textContent = payload.lastSyncText;
   document.getElementById("breachRatio").textContent = `${payload.breachSummary.shown} / ${payload.breachSummary.total} violating target`;
